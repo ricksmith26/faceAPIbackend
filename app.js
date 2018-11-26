@@ -19,6 +19,7 @@ let result;
 const trainFace = async (req, res, next) => {
     console.log('b4')
     const name = req.body._label;
+    console.log(name, 'NAME<<<<')
     try {
 
         //REWITE WITH PROMISEALL
@@ -34,7 +35,7 @@ const trainFace = async (req, res, next) => {
 
         })
         await new Promise((resolve, reject) => {
-            fs.readFile('./faceDescriptions.json', (err, data) => {
+            fs.readFile('./faceDescriptions2.json', (err, data) => {
                 if (err) { throw err }
                 else {
 
@@ -43,8 +44,10 @@ const trainFace = async (req, res, next) => {
             });
 
         })
+        console.log(names, '<><><><>', readableFile,'<<<<<<<<<<')
         if (names.indexOf(name) === -1) {
-            readableFile.push(req.body);
+            console.log({_label: name, _descriptors: [Object.values(req.body._descriptors[0])]}, '<<<<<<<<<<<<<<,,,')
+            readableFile.push({_label: name, _descriptors: Object.values(req.body._descriptors[0])});
             names.push(name);
 
             console.log(names, '<<<<<<<<<<<<<NAME')
@@ -55,10 +58,11 @@ const trainFace = async (req, res, next) => {
                 })
             })
 
+
             
             await new Promise((resolve, reject) => {
                 console.log(readableFile, '<<<READABLE')
-                fs.writeFileSync('./faceDescriptions.json', JSON.stringify(readableFile), (err) => {
+                fs.writeFileSync('./faceDescriptions2.json', JSON.stringify(readableFile), (err) => {
                     if (err) reject(err);
                     else resolve();
                 })
@@ -68,21 +72,20 @@ const trainFace = async (req, res, next) => {
             console.log('hit in list')
             result = readableFile.map((fd) => {
                 if (fd._label === name && fd._descriptors.length < 10) {
-                    fd._descriptors = [...fd._descriptors, req.body._descriptors[0]]
+                    newDescriptors = [...fd._descriptors, Object.values(req.body._descriptors[0])]
                     console.log('hit if block', fd._descriptors)
-                    return fd
+                    return {_label: name, _descriptors: newDescriptors}
                     //  console.log(fd._descriptors, 'HERE<<<<<<<<<<<<<<<<<<<<<<<')
                     
                 } else {
-                    
-                    fd._descriptors = [...fd._descriptors.slice(1), req.body._descriptors[0][0]]                  
+                                   
                     return fd;
 
                 }
             })
             console.log(result, 'RESULT<<<<<<<<<<<<<<<<<<<<<<<<<<,', result[0]._descriptors.length)
             await new Promise((resolve, reject) => {
-                fs.writeFile('./faceDescriptions.json', JSON.stringify(result), (err) => {
+                fs.writeFile('./faceDescriptions2.json', JSON.stringify(result), (err) => {
                     if (err) reject(err);
                     else resolve();
                 })
