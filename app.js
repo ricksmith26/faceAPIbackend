@@ -46,8 +46,10 @@ const trainFace = async (req, res, next) => {
         })
         console.log(names, '<><><><>', readableFile,'<<<<<<<<<<')
         if (names.indexOf(name) === -1) {
-            console.log({_label: name, _descriptors: [Object.values(req.body._descriptors[0])]}, '<<<<<<<<<<<<<<,,,')
-            readableFile.push({_label: name, _descriptors: Object.values(req.body._descriptors[0])});
+          
+            readableFile.push({_label: name, _descriptors: req.body._descriptors.map((d) => {
+                return Object.values(d)
+            })});
             names.push(name);
 
             console.log(names, '<<<<<<<<<<<<<NAME')
